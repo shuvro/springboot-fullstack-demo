@@ -17,10 +17,8 @@ public class Product {
     private LocalDateTime updatedAt;
     private List<ProductVariant> variants = new ArrayList<>();
 
-    // Default constructor
     public Product() {}
 
-    // Constructor for creating new products
     public Product(Long shopifyProductId, String title, String handle, BigDecimal price, String productType) {
         this(shopifyProductId, title, handle, price, productType, Collections.emptyList());
     }
@@ -48,72 +46,81 @@ public class Product {
         return id;
     }
 
-    public void setId(Long id) {
+    public Product setId(Long id) {
         this.id = id;
+        return this;
     }
 
     public Long getShopifyProductId() {
         return shopifyProductId;
     }
 
-    public void setShopifyProductId(Long shopifyProductId) {
+    public Product setShopifyProductId(Long shopifyProductId) {
         this.shopifyProductId = shopifyProductId;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public Product setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public String getHandle() {
         return handle;
     }
 
-    public void setHandle(String handle) {
+    public Product setHandle(String handle) {
         this.handle = handle;
+        return this;
     }
 
     public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public Product setPrice(BigDecimal price) {
         this.price = price;
+        return this;
     }
 
     public String getProductType() {
         return productType;
     }
 
-    public void setProductType(String productType) {
+    public Product setProductType(String productType) {
         this.productType = productType;
+        return this;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public Product setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public Product setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+        return this;
     }
 
     public List<ProductVariant> getVariants() {
         return variants;
     }
 
-    public void setVariants(List<ProductVariant> variants) {
+    public Product setVariants(List<ProductVariant> variants) {
         this.variants = variants != null ? new ArrayList<>(variants) : new ArrayList<>();
+        return this;
     }
 
     @Override

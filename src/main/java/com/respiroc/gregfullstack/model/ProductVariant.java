@@ -24,39 +24,44 @@ public class ProductVariant {
         return shopifyVariantId;
     }
 
-    public void setShopifyVariantId(Long shopifyVariantId) {
+    public ProductVariant setShopifyVariantId(Long shopifyVariantId) {
         this.shopifyVariantId = shopifyVariantId;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public ProductVariant setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public ProductVariant setPrice(BigDecimal price) {
         this.price = price;
+        return this;
     }
 
     public String getSku() {
         return sku;
     }
 
-    public void setSku(String sku) {
+    public ProductVariant setSku(String sku) {
         this.sku = sku;
+        return this;
     }
 
     public boolean isAvailable() {
         return available;
     }
 
-    public void setAvailable(boolean available) {
+    public ProductVariant setAvailable(boolean available) {
         this.available = available;
+        return this;
     }
 }

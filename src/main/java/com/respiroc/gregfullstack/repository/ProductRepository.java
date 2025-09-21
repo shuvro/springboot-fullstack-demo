@@ -14,6 +14,7 @@ import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -45,28 +46,7 @@ public class ProductRepository {
             """;
         
         return jdbcClient.sql(sql)
-                .query((rs, rowNum) -> {
-                    Product product = new Product();
-                    product.setId(rs.getLong("id"));
-                    product.setShopifyProductId(rs.getLong("shopify_product_id"));
-                    product.setTitle(rs.getString("title"));
-                    product.setHandle(rs.getString("handle"));
-                    product.setPrice(rs.getBigDecimal("price"));
-                    product.setProductType(rs.getString("product_type"));
-                    product.setVariants(readVariants(rs.getObject("variants")));
-                    
-                    Timestamp createdAt = rs.getTimestamp("created_at");
-                    if (createdAt != null) {
-                        product.setCreatedAt(createdAt.toLocalDateTime());
-                    }
-                    
-                    Timestamp updatedAt = rs.getTimestamp("updated_at");
-                    if (updatedAt != null) {
-                        product.setUpdatedAt(updatedAt.toLocalDateTime());
-                    }
-                    
-                    return product;
-                })
+                .query(this::mapProduct)
                 .list();
     }
 
@@ -79,28 +59,7 @@ public class ProductRepository {
         
         return jdbcClient.sql(sql)
                 .param(id)
-                .query((rs, rowNum) -> {
-                    Product product = new Product();
-                    product.setId(rs.getLong("id"));
-                    product.setShopifyProductId(rs.getLong("shopify_product_id"));
-                    product.setTitle(rs.getString("title"));
-                    product.setHandle(rs.getString("handle"));
-                    product.setPrice(rs.getBigDecimal("price"));
-                    product.setProductType(rs.getString("product_type"));
-                    product.setVariants(readVariants(rs.getObject("variants")));
-                    
-                    Timestamp createdAt = rs.getTimestamp("created_at");
-                    if (createdAt != null) {
-                        product.setCreatedAt(createdAt.toLocalDateTime());
-                    }
-                    
-                    Timestamp updatedAt = rs.getTimestamp("updated_at");
-                    if (updatedAt != null) {
-                        product.setUpdatedAt(updatedAt.toLocalDateTime());
-                    }
-                    
-                    return product;
-                })
+                .query(this::mapProduct)
                 .optional();
     }
 
@@ -113,28 +72,7 @@ public class ProductRepository {
         
         return jdbcClient.sql(sql)
                 .param(shopifyProductId)
-                .query((rs, rowNum) -> {
-                    Product product = new Product();
-                    product.setId(rs.getLong("id"));
-                    product.setShopifyProductId(rs.getLong("shopify_product_id"));
-                    product.setTitle(rs.getString("title"));
-                    product.setHandle(rs.getString("handle"));
-                    product.setPrice(rs.getBigDecimal("price"));
-                    product.setProductType(rs.getString("product_type"));
-                    product.setVariants(readVariants(rs.getObject("variants")));
-                    
-                    Timestamp createdAt = rs.getTimestamp("created_at");
-                    if (createdAt != null) {
-                        product.setCreatedAt(createdAt.toLocalDateTime());
-                    }
-                    
-                    Timestamp updatedAt = rs.getTimestamp("updated_at");
-                    if (updatedAt != null) {
-                        product.setUpdatedAt(updatedAt.toLocalDateTime());
-                    }
-                    
-                    return product;
-                })
+                .query(this::mapProduct)
                 .optional();
     }
 
@@ -175,10 +113,9 @@ public class ProductRepository {
             }
         }
 
-        product.setCreatedAt(now);
-        product.setUpdatedAt(now);
-        
-        return product;
+        return product
+                .setCreatedAt(now)
+                .setUpdatedAt(now);
     }
 
     private Product update(Product product) {
@@ -200,9 +137,8 @@ public class ProductRepository {
                 .param(Timestamp.valueOf(now))
                 .param(product.getId())
                 .update();
-        
-        product.setUpdatedAt(now);
-        return product;
+
+        return product.setUpdatedAt(now);
     }
 
     public void deleteById(Long id) {
@@ -264,5 +200,21 @@ public class ProductRepository {
         } catch (SQLException | JsonProcessingException e) {
             throw new IllegalStateException("Failed to serialise product variants", e);
         }
+    }
+
+    private Product mapProduct(ResultSet rs, int rowNum) throws SQLException {
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        Timestamp updatedAt = rs.getTimestamp("updated_at");
+
+        return new Product()
+                .setId(rs.getLong("id"))
+                .setShopifyProductId(rs.getLong("shopify_product_id"))
+                .setTitle(rs.getString("title"))
+                .setHandle(rs.getString("handle"))
+                .setPrice(rs.getBigDecimal("price"))
+                .setProductType(rs.getString("product_type"))
+                .setVariants(readVariants(rs.getObject("variants")))
+                .setCreatedAt(createdAt != null ? createdAt.toLocalDateTime() : null)
+                .setUpdatedAt(updatedAt != null ? updatedAt.toLocalDateTime() : null);
     }
 }

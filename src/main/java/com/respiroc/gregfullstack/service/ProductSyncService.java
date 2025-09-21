@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -122,7 +123,7 @@ public class ProductSyncService {
             List<ProductVariant> variants = extractVariants(productNode.get("variants"));
             BigDecimal minPrice = variants.stream()
                     .map(ProductVariant::getPrice)
-                    .filter(price -> price != null)
+                    .filter(Objects::nonNull)
                     .min(BigDecimal::compareTo)
                     .orElse(BigDecimal.ZERO);
 
@@ -155,7 +156,6 @@ public class ProductSyncService {
                         price = new BigDecimal(priceStr);
                     } catch (NumberFormatException e) {
                         logger.warn("Invalid price format for variant {}: {}", variantId, priceStr);
-                        price = BigDecimal.ZERO;
                     }
                 }
 
