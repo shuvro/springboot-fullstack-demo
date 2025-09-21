@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: assets(pageTitle=${'Search Products'})}"></th:block>
+
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        body {
+            font-family: var(--wa-font-sans);
+            margin: 0;
+            background-color: color-mix(in srgb, var(--wa-color-neutral-100, #f1f5f9) 85%, var(--wa-color-neutral-0, #ffffff) 15%);
+            background-image: radial-gradient(1200px circle at 0% 0%, color-mix(in srgb, var(--wa-color-primary-50, #eff6ff) 40%, var(--wa-color-neutral-0, #ffffff) 60%) 0%, transparent 70%),
+                              linear-gradient(180deg, color-mix(in srgb, var(--wa-color-neutral-100, #f1f5f9) 80%, var(--wa-color-neutral-0, #ffffff) 20%) 0%, var(--wa-color-neutral-0, #ffffff) 100%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--wa-color-neutral-900);
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 0 var(--wa-space-l);
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+            display: grid;
+            gap: var(--wa-space-xl);
+            padding: var(--wa-space-2xl) 0 var(--wa-space-3xl, 6rem);
+        }
+
+        .search-card {
+            display: grid;
+            gap: var(--wa-space-m);
+        }
+
+        .search-meta {
+            display: flex;
+            gap: var(--wa-space-l);
+            flex-wrap: wrap;
+            font-size: var(--wa-font-size-s);
+            color: var(--wa-color-neutral-600);
+        }
+
+        .results-card {
+            display: grid;
+            gap: var(--wa-space-m);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            border-radius: var(--wa-border-radius-m);
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--wa-color-neutral-0, #ffffff);
+        }
+
+        .products-table thead th {
+            padding: var(--wa-space-xs) var(--wa-space-m);
+            background-color: var(--wa-color-neutral-100, #f1f5f9);
+            color: var(--wa-color-neutral-600, #475569);
+            font-size: var(--wa-font-size-xs);
+            font-weight: var(--wa-font-weight-semibold, 600);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        .products-table tbody td {
+            padding: var(--wa-space-s) var(--wa-space-m);
+            border-top: 1px solid color-mix(in srgb, var(--wa-color-neutral-900) 10%, transparent);
+            vertical-align: middle;
+        }
+
+        .products-table tbody tr:hover {
+            background-color: color-mix(in srgb, var(--wa-color-info-100, #e0f2fe) 40%, transparent);
+        }
+
+        .table-empty {
+            text-align: center;
+            padding: var(--wa-space-xl);
+            color: var(--wa-color-neutral-500);
+            background-color: color-mix(in srgb, var(--wa-color-neutral-100, #f1f5f9) 60%, transparent);
+        }
+
+        .product-title {
+            font-weight: var(--wa-font-weight-semibold, 600);
+            color: var(--wa-color-neutral-900);
+        }
+
+        .product-handle {
+            font-family: var(--wa-font-mono);
+            font-size: var(--wa-font-size-xs);
+            color: var(--wa-color-neutral-500);
+        }
+
+        .product-price {
+            display: inline-flex;
+            align-items: baseline;
+            gap: var(--wa-space-3xs, 0.25rem);
+            font-size: var(--wa-font-size-s);
+        }
+
+        .product-price__value {
+            color: var(--wa-color-success-600);
+            font-weight: var(--wa-font-weight-semibold, 600);
+        }
+
+        .product-price__currency {
+            font-size: var(--wa-font-size-xs);
+            color: var(--wa-color-neutral-500);
+        }
+
+        .product-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--wa-space-3xs, 0.25rem);
+            padding: var(--wa-space-3xs, 0.25rem) var(--wa-space-xs);
+            border-radius: var(--wa-border-radius-full, 999px);
+            background-color: var(--wa-color-primary-100);
+            color: var(--wa-color-primary-700);
+            font-size: var(--wa-font-size-xs);
+            font-weight: var(--wa-font-weight-medium, 500);
+        }
+
+        .product-type-empty {
+            color: var(--wa-color-neutral-400);
+            font-style: italic;
+        }
+
+        .product-created {
+            font-family: var(--wa-font-mono);
+            font-size: var(--wa-font-size-xs);
+            color: var(--wa-color-neutral-500);
+        }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-flex;
+        }
+
+        footer {
+            text-align: center;
+            padding: var(--wa-space-xl) 0;
+            color: var(--wa-color-neutral-500);
+            font-size: var(--wa-font-size-s);
+        }
+    </style>
+</head>
+<body class="page">
+    <th:block th:replace="~{fragments/hero :: hero(
+        eyebrowIcon=${'search'},
+        eyebrowText=${'Inventory Lookup'},
+        titleIcon=${'search'},
+        titleText=${'Product Search'},
+        subtitleText=${'Look up products by title. Results update instantly as you type.'},
+        metricIcon=${'database'},
+        metricHeading=${'Inventory'},
+        metricValue=${totalProducts},
+        metricSubtext=${'Total products available'},
+        metricValueId=${null}
+    )}"></th:block>
+
+    <main class="container main-content">
+        <wa-breadcrumbs label="You are here">
+            <wa-breadcrumb-item href="/">
+                <wa-icon name="house" slot="prefix"></wa-icon>
+                Home
+            </wa-breadcrumb-item>
+            <wa-breadcrumb-item current>
+                <wa-icon name="search" slot="prefix"></wa-icon>
+                Search
+            </wa-breadcrumb-item>
+        </wa-breadcrumbs>
+
+        <wa-card class="search-card">
+            <div slot="header">
+                <wa-icon name="sparkles"></wa-icon>
+                Search Inventory
+            </div>
+            <form id="product-search-form"
+                  hx-get="/search/results"
+                  hx-target="#search-results tbody"
+                  hx-swap="innerHTML"
+                  hx-trigger="input changed delay:250ms, search"
+                  hx-indicator="#search-loading">
+                <wa-input id="product-search" name="q" type="search"
+                          label="Search by Title"
+                          placeholder="Start typing to search products...">
+                    <wa-icon name="search" slot="prefix"></wa-icon>
+                    <wa-spinner id="search-loading" slot="suffix" class="htmx-indicator"></wa-spinner>
+                </wa-input>
+            </form>
+            <div class="search-meta">
+                <span><strong>Total products:</strong> <span th:text="${totalProducts}">0</span></span>
+                <span><strong>Matches:</strong> <span id="match-count">0</span></span>
+            </div>
+        </wa-card>
+
+        <wa-card class="results-card">
+            <div slot="header">
+                <wa-icon name="list"></wa-icon>
+                Search Results
+            </div>
+            <div class="table-scroll">
+                <table id="search-results" class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Handle</th>
+                            <th>Price</th>
+                            <th>Variants</th>
+                            <th>Type</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="table-empty">
+                                Start typing to search for a product by title.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </wa-card>
+    </main>
+
+    <footer>
+        <p>
+            <wa-icon name="code" style="margin-right: var(--wa-space-s);"></wa-icon>
+            Built with Spring Boot, HTMX, Thymeleaf &amp; PostgreSQL
+        </p>
+    </footer>
+</body>
+</html>

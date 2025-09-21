@@ -33,6 +33,30 @@ public class ProductController {
         return "index";
     }
 
+    @GetMapping("/search")
+    public String searchPage(Model model) {
+        logger.info("Accessing product search page");
+        model.addAttribute("totalProducts", productRepository.count());
+        return "search";
+    }
+
+    @GetMapping("/search/results")
+    public String searchProducts(@RequestParam(name = "q", required = false) String query, Model model) {
+        String searchTerm = query != null ? query.trim() : "";
+        boolean searchPerformed = !searchTerm.isEmpty();
+
+        logger.info("Searching for products with query: '{}'", searchTerm);
+
+        List<Product> products = searchPerformed ? productRepository.searchByTitle(searchTerm) : List.of();
+
+        model.addAttribute("products", products);
+        model.addAttribute("searchTerm", query != null ? query : "");
+        model.addAttribute("searchPerformed", searchPerformed);
+        model.addAttribute("matchCount", products.size());
+
+        return "fragments/product-search-rows";
+    }
+
     @GetMapping("/products")
     public String loadProducts(Model model) {
         logger.info("Loading products via HTMX");

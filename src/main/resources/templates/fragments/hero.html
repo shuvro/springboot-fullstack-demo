@@ -1,0 +1,124 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <style th:fragment="heroStyles">
+        .hero-callout {
+            margin: 0;
+            border-radius: 0;
+            padding: var(--wa-space-2xl) 0;
+            background: linear-gradient(135deg, var(--wa-color-primary-800, #1e3a8a) 0%, var(--wa-color-primary-600, #2563eb) 48%, var(--wa-color-info-600, #0284c7) 100%);
+            color: var(--wa-color-neutral-0, #ffffff);
+        }
+
+        .hero-content {
+            display: grid;
+            gap: var(--wa-space-xl);
+            align-items: center;
+        }
+
+        .hero-copy {
+            display: grid;
+            gap: var(--wa-space-m);
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--wa-space-xs);
+            padding: var(--wa-space-2xs) var(--wa-space-xs);
+            border-radius: var(--wa-border-radius-full, 999px);
+            background-color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 10%, transparent);
+            color: var(--wa-color-neutral-0, #ffffff);
+            font-size: var(--wa-font-size-xs);
+            font-weight: var(--wa-font-weight-medium, 500);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--wa-space-m);
+            font-size: var(--wa-font-size-3xl);
+            font-weight: var(--wa-font-weight-semibold, 600);
+        }
+
+        .hero-title-icon {
+            font-size: var(--wa-font-size-3xl);
+        }
+
+        .hero-subtitle {
+            margin: 0;
+            max-width: 52ch;
+            color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 82%, transparent);
+            font-size: var(--wa-font-size-m);
+        }
+
+        .hero-meta {
+            display: grid;
+            gap: var(--wa-space-m);
+        }
+
+        wa-card.hero-metric-card {
+            color: var(--wa-color-neutral-0, #ffffff);
+            text-align: center;
+            min-width: 220px;
+            background-color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 16%, transparent);
+            border: 1px solid color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 28%, transparent);
+        }
+
+        wa-card.hero-metric-card [slot="header"] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--wa-space-xs);
+            font-size: var(--wa-font-size-s);
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            opacity: 0.82;
+        }
+
+        wa-card.hero-metric-card h3 {
+            margin: 0;
+            font-size: var(--wa-font-size-2xl);
+            font-weight: var(--wa-font-weight-semibold, 600);
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                justify-items: flex-start;
+            }
+
+            wa-card.hero-metric-card {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <th:block th:fragment="hero(eyebrowIcon, eyebrowText, titleIcon, titleText, subtitleText, metricIcon, metricHeading, metricValue, metricSubtext, metricValueId)">
+        <wa-callout class="hero-callout" variant="primary" dismissible="false">
+            <div class="container hero-content">
+                <div class="hero-copy">
+                    <span class="hero-eyebrow">
+                        <wa-icon th:attr="name=${eyebrowIcon}"></wa-icon>
+                        <span th:text="${eyebrowText}">Section</span>
+                    </span>
+                    <h1 class="hero-title">
+                        <wa-icon class="hero-title-icon" th:attr="name=${titleIcon}"></wa-icon>
+                        <span th:text="${titleText}">Title</span>
+                    </h1>
+                    <p class="hero-subtitle" th:text="${subtitleText}">Subtitle</p>
+                </div>
+                <div class="hero-meta" th:if="${metricHeading != null}">
+                    <wa-card class="hero-metric-card">
+                        <div slot="header">
+                            <wa-icon th:if="${metricIcon != null}" th:attr="name=${metricIcon}"></wa-icon>
+                            <span th:text="${metricHeading}">Metric</span>
+                        </div>
+                        <h3 th:attr="id=${metricValueId}" th:text="${metricValue}">0</h3>
+                        <small th:text="${metricSubtext}">Metric description</small>
+                    </wa-card>
+                </div>
+            </div>
+        </wa-callout>
+    </th:block>
+</th:block>

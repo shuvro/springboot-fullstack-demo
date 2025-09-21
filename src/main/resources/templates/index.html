@@ -1,16 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management System</title>
-
-    <!-- Web Awesome Web Components -->
-    <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/styles/webawesome.css" />
-    <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/webawesome.loader.js"></script>
-
-    <!-- HTMX -->
-    <script src="/htmx.min.js"></script>
+    <th:block th:replace="~{fragments/head :: assets(pageTitle=${'Product Management System'})}"></th:block>
 
     <style>
         :root {
@@ -38,89 +29,6 @@
             width: min(1120px, 100%);
             margin: 0 auto;
             padding: 0 var(--wa-space-l);
-        }
-
-        .hero-callout {
-            margin: 0;
-            border-radius: 0;
-            padding: var(--wa-space-2xl) 0;
-            background: linear-gradient(135deg, var(--wa-color-primary-800, #1e3a8a) 0%, var(--wa-color-primary-600, #2563eb) 48%, var(--wa-color-info-600, #0284c7) 100%);
-            color: var(--wa-color-neutral-0, #ffffff);
-        }
-
-        .hero-content {
-            display: grid;
-            gap: var(--wa-space-xl);
-            align-items: center;
-        }
-
-        .hero-copy {
-            display: grid;
-            gap: var(--wa-space-m);
-        }
-
-        .hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--wa-space-xs);
-            padding: var(--wa-space-2xs) var(--wa-space-xs);
-            border-radius: var(--wa-border-radius-full, 999px);
-            background-color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 10%, transparent);
-            color: var(--wa-color-neutral-0, #ffffff);
-            font-size: var(--wa-font-size-xs);
-            font-weight: var(--wa-font-weight-medium, 500);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        .hero-title {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: var(--wa-space-m);
-            font-size: var(--wa-font-size-3xl);
-            font-weight: var(--wa-font-weight-semibold, 600);
-        }
-
-        .hero-title-icon {
-            font-size: var(--wa-font-size-3xl);
-        }
-
-        .hero-subtitle {
-            margin: 0;
-            max-width: 52ch;
-            color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 82%, transparent);
-            font-size: var(--wa-font-size-m);
-        }
-
-        .hero-meta {
-            display: grid;
-            gap: var(--wa-space-m);
-        }
-
-        wa-card.hero-metric-card {
-            color: var(--wa-color-neutral-0, #ffffff);
-            text-align: center;
-            min-width: 220px;
-            background-color: color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 16%, transparent);
-            border: 1px solid color-mix(in srgb, var(--wa-color-neutral-0, #ffffff) 28%, transparent);
-        }
-
-        wa-card.hero-metric-card [slot="header"] {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--wa-space-xs);
-            font-size: var(--wa-font-size-s);
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            opacity: 0.82;
-        }
-
-        wa-card.hero-metric-card h3 {
-            margin: 0;
-            font-size: var(--wa-font-size-2xl);
-            font-weight: var(--wa-font-weight-semibold, 600);
         }
 
         main {
@@ -307,14 +215,6 @@
         }
 
         @media (max-width: 768px) {
-            .hero-content {
-                justify-items: flex-start;
-            }
-
-            wa-card.hero-metric-card {
-                width: 100%;
-            }
-
             .table-scroll {
                 border-radius: var(--wa-border-radius-s);
             }
@@ -322,33 +222,18 @@
     </style>
 </head>
 <body class="page">
-    <wa-callout class="hero-callout" variant="primary" dismissible="false">
-        <div class="container hero-content">
-            <div class="hero-copy">
-                <span class="hero-eyebrow">
-                    <wa-icon name="sparkles"></wa-icon>
-                    Product Operations
-                </span>
-                <h1 class="hero-title">
-                    <wa-icon name="box" class="hero-title-icon"></wa-icon>
-                    Product Management System
-                </h1>
-                <p class="hero-subtitle">
-                    Product management workspace with real-time API sync, fast editing, and Web Awesome components.
-                </p>
-            </div>
-            <div class="hero-meta">
-                <wa-card class="hero-metric-card">
-                    <div slot="header">
-                        <wa-icon name="database"></wa-icon>
-                        Inventory
-                    </div>
-                    <h3 id="product-count" th:text="${productCount}">0</h3>
-                    <small>Products currently in the database</small>
-                </wa-card>
-            </div>
-        </div>
-    </wa-callout>
+    <th:block th:replace="~{fragments/hero :: hero(
+        eyebrowIcon=${'sparkles'},
+        eyebrowText=${'Product Operations'},
+        titleIcon=${'box'},
+        titleText=${'Product Management System'},
+        subtitleText=${'Product management workspace with real-time API sync, fast editing, and Web Awesome components.'},
+        metricIcon=${'database'},
+        metricHeading=${'Inventory'},
+        metricValue=${productCount},
+        metricSubtext=${'Products currently in the database'},
+        metricValueId=${'product-count'}
+    )}"></th:block>
 
     <main class="container main-content">
         <wa-card class="actions-card">
@@ -383,6 +268,11 @@
                            hx-target="#product-form-container">
                     <wa-icon name="plus" slot="prefix"></wa-icon>
                     Add Product
+                </wa-button>
+
+                <wa-button variant="info" href="/search">
+                    <wa-icon name="search" slot="prefix"></wa-icon>
+                    Search Products
                 </wa-button>
             </wa-button-group>
             <div id="sync-status" class="feedback-region" aria-live="polite"></div>

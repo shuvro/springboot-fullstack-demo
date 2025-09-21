@@ -50,6 +50,31 @@ public class ProductRepository {
                 .list();
     }
 
+    public List<Product> searchByTitle(String query) {
+        if (query == null) {
+            return List.of();
+        }
+
+        String trimmed = query.trim();
+        if (trimmed.isEmpty()) {
+            return List.of();
+        }
+
+        String pattern = "%" + escapeForLike(trimmed) + "%";
+
+        String sql = """
+            SELECT id, shopify_product_id, title, handle, price, product_type, variants, created_at, updated_at
+            FROM products
+            WHERE title ILIKE ? ESCAPE '\\'
+            ORDER BY created_at DESC
+            """;
+
+        return jdbcClient.sql(sql)
+                .param(pattern)
+                .query(this::mapProduct)
+                .list();
+    }
+
     public Optional<Product> findById(Long id) {
         String sql = """
             SELECT id, shopify_product_id, title, handle, price, product_type, variants, created_at, updated_at
@@ -200,6 +225,13 @@ public class ProductRepository {
         } catch (SQLException | JsonProcessingException e) {
             throw new IllegalStateException("Failed to serialise product variants", e);
         }
+    }
+
+    private String escapeForLike(String input) {
+        return input
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
     private Product mapProduct(ResultSet rs, int rowNum) throws SQLException {
