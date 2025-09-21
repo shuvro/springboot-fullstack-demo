@@ -88,6 +88,17 @@
             background-color: color-mix(in srgb, var(--wa-color-info-100, #e0f2fe) 40%, transparent);
         }
 
+        .table-actions {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .column-heading {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--wa-space-2xs, 0.25rem);
+        }
+
         .table-empty {
             text-align: center;
             padding: var(--wa-space-xl);
@@ -224,17 +235,18 @@
                 <table id="search-results" class="products-table">
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Handle</th>
-                            <th>Price</th>
-                            <th>Variants</th>
-                            <th>Type</th>
-                            <th>Created</th>
+                            <th><span class="column-heading">Title</span></th>
+                            <th><span class="column-heading">Handle</span></th>
+                            <th><span class="column-heading">Price</span></th>
+                            <th><span class="column-heading">Variants</span></th>
+                            <th><span class="column-heading">Type</span></th>
+                            <th><span class="column-heading">Created</span></th>
+                            <th><span class="column-heading">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="6" class="table-empty">
+                            <td colspan="7" class="table-empty">
                                 Start typing to search for a product by title.
                             </td>
                         </tr>

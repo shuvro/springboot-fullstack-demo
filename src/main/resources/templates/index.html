@@ -105,6 +105,17 @@
             background-color: color-mix(in srgb, var(--wa-color-info-100, #e0f2fe) 40%, transparent);
         }
 
+        .table-actions {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .column-heading {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--wa-space-2xs, 0.25rem);
+        }
+
         .table-empty,
         .table-error {
             text-align: center;
@@ -299,34 +310,52 @@
                     <thead>
                         <tr>
                             <th>
-                                <wa-icon name="tag" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Title
+                                <span class="column-heading">
+                                    <wa-icon name="tag"></wa-icon>
+                                    Title
+                                </span>
                             </th>
                             <th>
-                                <wa-icon name="link" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Handle
+                                <span class="column-heading">
+                                    <wa-icon name="link"></wa-icon>
+                                    Handle
+                                </span>
                             </th>
                             <th>
-                                <wa-icon name="currency-dollar" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Price
+                                <span class="column-heading">
+                                    <wa-icon name="currency-dollar"></wa-icon>
+                                    Price
+                                </span>
                             </th>
                             <th>
-                                <wa-icon name="layers" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Variants
+                                <span class="column-heading">
+                                    <wa-icon name="layers"></wa-icon>
+                                    Variants
+                                </span>
                             </th>
                             <th>
-                                <wa-icon name="collection" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Type
+                                <span class="column-heading">
+                                    <wa-icon name="collection"></wa-icon>
+                                    Type
+                                </span>
                             </th>
                             <th>
-                                <wa-icon name="calendar" style="margin-right: var(--wa-space-2xs);"></wa-icon>
-                                Created
+                                <span class="column-heading">
+                                    <wa-icon name="calendar"></wa-icon>
+                                    Created
+                                </span>
+                            </th>
+                            <th>
+                                <span class="column-heading">
+                                    <wa-icon name="trash"></wa-icon>
+                                    Actions
+                                </span>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="6" class="table-empty">
+                            <td colspan="7" class="table-empty">
                                 <wa-icon name="info-circle" style="margin-right: var(--wa-space-s);"></wa-icon>
                                 Use <strong>Load Products</strong> to display items from the database.
                             </td>

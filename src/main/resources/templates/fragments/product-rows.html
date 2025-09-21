@@ -1,7 +1,7 @@
 <th:block xmlns:th="http://www.thymeleaf.org">
     <th:block th:if="${errorMessage != null}">
         <tr>
-            <td colspan="6" class="table-error">
+            <td colspan="7" class="table-error">
                 <wa-alert variant="danger" open>
                     <wa-icon name="exclamation-triangle" slot="icon"></wa-icon>
                     Error adding product: <span th:text="${errorMessage}">Unknown error</span>
@@ -12,7 +12,7 @@
 
     <th:block th:if="${#lists.isEmpty(products)}">
         <tr>
-            <td colspan="6" class="table-empty">
+            <td colspan="7" class="table-empty">
                 <wa-icon name="info-circle" style="margin-right: var(--wa-space-s);"></wa-icon>
                 No products found. Select <strong>Sync from API</strong> to fetch the latest inventory.
             </td>
@@ -42,6 +42,16 @@
         </td>
         <td>
             <span class="product-created" th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</span>
+        </td>
+        <td class="table-actions">
+            <wa-button variant="danger"
+                       th:attr="hx-post=@{/products/{id}/delete(id=${product.id})}"
+                       hx-target="#products-table tbody"
+                       hx-swap="innerHTML"
+                       hx-confirm="Are you sure you want to delete this product?">
+                <wa-icon name="trash" slot="prefix"></wa-icon>
+                Delete
+            </wa-button>
         </td>
     </tr>
 

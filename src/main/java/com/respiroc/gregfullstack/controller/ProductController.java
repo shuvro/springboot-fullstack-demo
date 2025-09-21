@@ -171,4 +171,29 @@ public class ProductController {
         redirectAttributes.addFlashAttribute("updateSuccess", true);
         return "redirect:/products/" + id;
     }
+
+    @PostMapping("/products/{id}/delete")
+    public String deleteProduct(@PathVariable Long id,
+                                @RequestParam(value = "q", required = false) String query,
+                                @RequestHeader(value = "HX-Request", required = false) Boolean isHxRequest,
+                                Model model,
+                                RedirectAttributes redirectAttributes) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        productRepository.deleteById(id);
+        logger.info("Deleted product id={} (title={})", id, product.getTitle());
+
+        boolean hxRequest = Boolean.TRUE.equals(isHxRequest);
+
+        if (hxRequest) {
+            if (query != null) {
+                return searchProducts(query, model);
+            }
+            return loadProducts(model);
+        }
+
+        redirectAttributes.addFlashAttribute("productDeleted", true);
+        return "redirect:/";
+    }
 }
