@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: assets(pageTitle=${product.title + ' · Product Detail'})}"></th:block>
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        body {
+            font-family: var(--wa-font-sans);
+            margin: 0;
+            background-color: color-mix(in srgb, var(--wa-color-neutral-100, #f1f5f9) 85%, var(--wa-color-neutral-0, #ffffff) 15%);
+            background-image: radial-gradient(1200px circle at 0% 0%, color-mix(in srgb, var(--wa-color-primary-50, #eff6ff) 40%, var(--wa-color-neutral-0, #ffffff) 60%) 0%, transparent 70%),
+                              linear-gradient(180deg, color-mix(in srgb, var(--wa-color-neutral-100, #f1f5f9) 80%, var(--wa-color-neutral-0, #ffffff) 20%) 0%, var(--wa-color-neutral-0, #ffffff) 100%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--wa-color-neutral-900);
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: min(960px, 100%);
+            margin: 0 auto;
+            padding: 0 var(--wa-space-l);
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        .main-content {
+            padding: var(--wa-space-2xl) 0 var(--wa-space-3xl, 6rem);
+            display: grid;
+            gap: var(--wa-space-xl);
+        }
+
+        wa-card.detail-card {
+            display: grid;
+            gap: var(--wa-space-l);
+        }
+
+        form.product-detail-form {
+            display: grid;
+            gap: var(--wa-space-xl);
+        }
+
+        .form-grid {
+            display: grid;
+            gap: var(--wa-space-xl);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            align-items: start;
+        }
+
+        wa-button-group.form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--wa-space-s);
+        }
+
+        .meta-grid {
+            display: grid;
+            gap: var(--wa-space-l);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .meta-card {
+            background-color: var(--wa-color-neutral-0, #ffffff);
+            border-radius: var(--wa-border-radius-m);
+            padding: var(--wa-space-l);
+            box-shadow: 0 12px 40px -24px rgb(15 23 42 / 0.45);
+        }
+
+        .meta-card dt {
+            font-size: var(--wa-font-size-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--wa-color-neutral-500);
+            margin-bottom: var(--wa-space-3xs);
+        }
+
+        .meta-card dd {
+            margin: 0;
+            font-weight: var(--wa-font-weight-medium, 500);
+            color: var(--wa-color-neutral-900);
+        }
+
+        .footer {
+            padding: var(--wa-space-2xl) 0;
+            text-align: center;
+            color: var(--wa-color-neutral-500);
+        }
+
+        .footer p {
+            margin: 0 0 var(--wa-space-s) 0;
+        }
+    </style>
+</head>
+<body class="page">
+    <th:block th:replace="~{fragments/hero :: hero(
+        eyebrowIcon=${'tag'},
+        eyebrowText=${'Product Detail'},
+        titleIcon=${'file-pen'},
+        titleText=${product.title},
+        subtitleText=${'Handle: ' + product.handle},
+        metricIcon=${'currency-dollar'},
+        metricHeading=${'Current Price'},
+        metricValue=${product.price},
+        metricSubtext=${'Variants: ' + (#lists.size(product.variants))},
+        metricValueId=${'product-price'}
+    )}"></th:block>
+
+    <main class="container main-content">
+        <div th:if="${updateSuccess}" role="status">
+            <wa-alert variant="success" open>
+                <wa-icon name="check-circle" slot="icon"></wa-icon>
+                Product updated successfully.
+            </wa-alert>
+        </div>
+        <div th:if="${updateError != null}" role="alert">
+            <wa-alert variant="danger" open>
+                <wa-icon name="exclamation-triangle" slot="icon"></wa-icon>
+                <span th:text="${updateError}">Unable to update product.</span>
+            </wa-alert>
+        </div>
+
+        <wa-card class="detail-card">
+            <div slot="header">
+                <wa-icon name="pencil-square"></wa-icon>
+                Edit Product Information
+            </div>
+
+            <form class="product-detail-form" th:action="@{/products/{id}(id=${product.id})}" method="post">
+                <div class="form-grid">
+                    <wa-input name="title" label="Product Title" required
+                              placeholder="Enter product title"
+                              th:attr="value=${product.title}">
+                        <wa-icon name="tag" slot="prefix"></wa-icon>
+                    </wa-input>
+
+                    <wa-input name="handle" label="Handle" required
+                              placeholder="product-handle"
+                              th:attr="value=${product.handle}">
+                        <wa-icon name="link" slot="prefix"></wa-icon>
+                    </wa-input>
+
+                    <wa-input name="shopifyProductId" label="Shopify Product ID" placeholder="Optional"
+                              th:attr="value=${product.shopifyProductId != null ? product.shopifyProductId : ''}">
+                        <wa-icon name="box-seam" slot="prefix"></wa-icon>
+                    </wa-input>
+
+                    <wa-input type="number" step="0.01" min="0" name="price" label="Price (NOK)" required
+                              placeholder="0.00" th:attr="value=${product.price}">
+                        <wa-icon name="currency-dollar" slot="prefix"></wa-icon>
+                    </wa-input>
+
+                    <wa-input name="productType" label="Product Type" placeholder="e.g., Leggings, Sports Bra"
+                              th:attr="value=${product.productType != null ? product.productType : ''}">
+                        <wa-icon name="collection" slot="prefix"></wa-icon>
+                    </wa-input>
+                </div>
+
+                <wa-button-group class="form-actions">
+                    <wa-button type="submit" variant="primary">
+                        <wa-icon name="floppy" slot="prefix"></wa-icon>
+                        Save Changes
+                    </wa-button>
+                    <wa-button variant="default" href="/">
+                        <wa-icon name="arrow-left" slot="prefix"></wa-icon>
+                        Back to Dashboard
+                    </wa-button>
+                </wa-button-group>
+            </form>
+        </wa-card>
+
+        <section class="meta-grid" aria-label="Product metadata">
+            <div class="meta-card">
+                <dl>
+                    <dt>Database ID</dt>
+                    <dd th:text="${product.id}">0</dd>
+                </dl>
+            </div>
+            <div class="meta-card">
+                <dl>
+                    <dt>Created</dt>
+                    <dd th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">N/A</dd>
+                </dl>
+            </div>
+            <div class="meta-card">
+                <dl>
+                    <dt>Last Updated</dt>
+                    <dd th:text="${product.updatedAt != null ? #temporals.format(product.updatedAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">N/A</dd>
+                </dl>
+            </div>
+            <div class="meta-card">
+                <dl>
+                    <dt>Variants</dt>
+                    <dd th:text="${#lists.size(product.variants)}">0</dd>
+                </dl>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>
+            <wa-icon name="code" style="margin-right: var(--wa-space-s);"></wa-icon>
+            Built with Spring Boot, HTMX, Thymeleaf &amp; PostgreSQL
+        </p>
+        <small>Stack: Java 25 · Gradle 9.1.0 · Spring Boot 3.5.6 · Web Awesome</small>
+    </footer>
+</body>
+</html>

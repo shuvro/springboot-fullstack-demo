@@ -6,9 +6,12 @@ import com.respiroc.gregfullstack.repository.ProductRepository;
 import com.respiroc.gregfullstack.service.ProductSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -69,6 +72,18 @@ public class ProductController {
         return "fragments/product-rows";
     }
 
+    @GetMapping("/products/{id}")
+    public String viewProduct(@PathVariable Long id, Model model) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        logger.info("Viewing product detail for id={}", id);
+
+        model.addAttribute("product", product);
+        model.addAttribute("productCount", productRepository.count());
+        return "product-detail";
+    }
+
     @PostMapping("/products/sync")
     public String syncProducts(Model model) {
         logger.info("Manual product sync triggered via HTMX");
@@ -115,5 +130,45 @@ public class ProductController {
     @GetMapping("/products/form-close")
     public String closeProductForm() {
         return "fragments/empty";
+    }
+
+    @PostMapping("/products/{id}")
+    public String updateProduct(@PathVariable Long id,
+                                @RequestParam String title,
+                                @RequestParam String handle,
+                                @RequestParam BigDecimal price,
+                                @RequestParam(required = false) String productType,
+                                @RequestParam(value = "shopifyProductId", required = false) String shopifyProductIdValue,
+                                RedirectAttributes redirectAttributes) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        logger.info("Updating product id={} with new details", id);
+
+        Long shopifyProductId = null;
+        if (shopifyProductIdValue != null && !shopifyProductIdValue.isBlank()) {
+            try {
+                shopifyProductId = Long.valueOf(shopifyProductIdValue.trim());
+            } catch (NumberFormatException ex) {
+                redirectAttributes.addFlashAttribute("updateError", "Shopify product ID must be a number.");
+                return "redirect:/products/" + id;
+            }
+        }
+
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            redirectAttributes.addFlashAttribute("updateError", "Price cannot be negative.");
+            return "redirect:/products/" + id;
+        }
+
+        product.setShopifyProductId(shopifyProductId)
+                .setTitle(title.trim())
+                .setHandle(handle.trim())
+                .setPrice(price)
+                .setProductType(productType != null && !productType.isBlank() ? productType.trim() : null);
+
+        productRepository.save(product);
+
+        redirectAttributes.addFlashAttribute("updateSuccess", true);
+        return "redirect:/products/" + id;
     }
 }

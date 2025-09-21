@@ -21,7 +21,8 @@
 
     <tr th:each="product : ${products}">
         <td>
-            <span class="product-title" th:text="${product.title}">Product Title</span>
+            <a class="product-title" th:href="@{/products/{id}(id=${product.id})}"
+               th:text="${product.title}">Product Title</a>
         </td>
         <td>
             <span class="product-handle" th:text="${product.handle}">product-handle</span>
