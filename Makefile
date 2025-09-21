@@ -25,16 +25,7 @@ up: ## Start all services in detached mode
 	docker compose up --build -d
 	@echo "$(GREEN)Services started successfully!$(RESET)"
 	@echo "$(YELLOW)Application:$(RESET) http://localhost:8080"
-	@echo "$(YELLOW)pgAdmin:$(RESET)     http://localhost:5050 (admin@admin.com / admin)"
 	@echo "$(YELLOW)PostgreSQL:$(RESET)  localhost:5432"
-
-up-dev: ## Start only database services for local development
-	@echo "$(GREEN)Starting database services for local development...$(RESET)"
-	docker compose -f docker-compose.dev.yml up -d
-	@echo "$(GREEN)Database services started successfully!$(RESET)"
-	@echo "$(YELLOW)PostgreSQL:$(RESET)  localhost:5432 (postgres/password)"
-	@echo "$(YELLOW)pgAdmin:$(RESET)     http://localhost:5050 (admin@admin.com / admin)"
-	@echo "$(GREEN)Now run your Spring Boot app through IntelliJ!$(RESET)"
 
 down: ## Stop all services
 	@echo "$(GREEN)Stopping Greg Fullstack services...$(RESET)"

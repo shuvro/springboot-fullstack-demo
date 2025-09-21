@@ -1,57 +1,43 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
-    <div class="card mt-3">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="fas fa-plus me-2"></i>Add New Product
-            </h5>
-        </div>
-        <div class="card-body">
-            <form hx-post="/products" hx-target="#products-table tbody" hx-swap="beforeend" hx-on::after-request="this.reset()">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Product Title *</label>
-                            <input type="text" class="form-control" id="title" name="title" required 
-                                   placeholder="Enter product title">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="handle" class="form-label">Handle *</label>
-                            <input type="text" class="form-control" id="handle" name="handle" required 
-                                   placeholder="product-handle">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="price" class="form-label">Price (NOK) *</label>
-                            <input type="number" step="0.01" class="form-control" id="price" name="price" required 
-                                   placeholder="0.00" min="0">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="productType" class="form-label">Product Type</label>
-                            <input type="text" class="form-control" id="productType" name="productType" 
-                                   placeholder="e.g., Leggings, Sports Bra">
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Add Product
-                    </button>
-                    <button type="button" class="btn btn-secondary" 
-                            hx-get="/products/form-close" hx-target="#product-form-container">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
+<wa-card class="form-card">
+    <div slot="header">
+        <wa-icon name="plus"></wa-icon>
+        Add New Product
     </div>
-</body>
-</html>
+
+    <form class="product-form"
+          hx-post="/products"
+          hx-target="#products-table tbody"
+          hx-swap="beforeend"
+          hx-on::after-request="this.reset()">
+
+        <div class="form-grid">
+            <wa-input name="title" label="Product Title" placeholder="Enter product title" required>
+                <wa-icon name="tag" slot="prefix"></wa-icon>
+            </wa-input>
+
+            <wa-input name="handle" label="Handle" placeholder="product-handle" required>
+                <wa-icon name="link" slot="prefix"></wa-icon>
+            </wa-input>
+
+            <wa-input type="number" step="0.01" name="price" label="Price (NOK)" placeholder="0.00" min="0" required>
+                <wa-icon name="currency-dollar" slot="prefix"></wa-icon>
+            </wa-input>
+
+            <wa-input name="productType" label="Product Type" placeholder="e.g., Leggings, Sports Bra">
+                <wa-icon name="collection" slot="prefix"></wa-icon>
+            </wa-input>
+        </div>
+
+        <wa-button-group class="form-actions">
+            <wa-button type="submit" variant="primary">
+                <wa-icon name="floppy" slot="prefix"></wa-icon>
+                Add Product
+            </wa-button>
+            <wa-button type="button" variant="default"
+                       hx-get="/products/form-close" hx-target="#product-form-container">
+                <wa-icon name="x" slot="prefix"></wa-icon>
+                Cancel
+            </wa-button>
+        </wa-button-group>
+    </form>
+</wa-card>

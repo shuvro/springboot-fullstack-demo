@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:if="${success}" class="alert alert-success" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
+    <wa-alert th:if="${success}" variant="success" open>
+        <wa-icon name="check-circle" slot="icon"></wa-icon>
         <span th:text="${message}">Success message</span>
-    </div>
+    </wa-alert>
     
-    <div th:if="${!success}" class="alert alert-danger" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
+    <wa-alert th:if="${!success}" variant="danger" open>
+        <wa-icon name="exclamation-triangle" slot="icon"></wa-icon>
         <span th:text="${message}">Error message</span>
-    </div>
+    </wa-alert>
 </body>
 </html>
