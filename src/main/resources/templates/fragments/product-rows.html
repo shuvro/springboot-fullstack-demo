@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <th:block th:if="${#lists.isEmpty(products)}">
+        <tr>
+            <td colspan="5" class="text-center text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                No products found. Click 'Sync from API' to fetch products.
+            </td>
+        </tr>
+    </th:block>
+    
+    <tr th:each="product : ${products}">
+        <td th:text="${product.title}">Product Title</td>
+        <td th:text="${product.handle}">product-handle</td>
+        <td>
+            <span th:text="${product.price}">0.00</span> NOK
+        </td>
+        <td th:text="${product.productType != null ? product.productType : 'N/A'}">Product Type</td>
+        <td th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</td>
+    </tr>
+</body>
+</html>

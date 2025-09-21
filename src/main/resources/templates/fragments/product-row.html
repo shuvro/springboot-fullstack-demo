@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <tr th:if="${success}">
+        <td th:text="${product.title}">Product Title</td>
+        <td th:text="${product.handle}">product-handle</td>
+        <td>
+            <span th:text="${product.price}">0.00</span> NOK
+        </td>
+        <td th:text="${product.productType != null ? product.productType : 'N/A'}">Product Type</td>
+        <td th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</td>
+    </tr>
+    
+    <tr th:if="${!success}">
+        <td colspan="5" class="text-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Error adding product: <span th:text="${errorMessage}">Unknown error</span>
+        </td>
+    </tr>
+</body>
+</html>
