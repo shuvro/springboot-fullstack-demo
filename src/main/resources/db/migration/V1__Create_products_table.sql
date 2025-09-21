@@ -1,7 +1,7 @@
 -- Create products table
 CREATE TABLE products (
     id BIGSERIAL PRIMARY KEY,
-    shopify_product_id BIGINT UNIQUE NOT NULL,
+    shopify_product_id BIGINT UNIQUE,
     title VARCHAR(500) NOT NULL,
     handle VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,

@@ -1,6 +1,7 @@
 package com.respiroc.gregfullstack.controller;
 
 import com.respiroc.gregfullstack.model.Product;
+import com.respiroc.gregfullstack.model.ProductVariant;
 import com.respiroc.gregfullstack.repository.ProductRepository;
 import com.respiroc.gregfullstack.service.ProductSyncService;
 import org.slf4j.Logger;
@@ -37,6 +38,10 @@ public class ProductController {
         logger.info("Loading products via HTMX");
         List<Product> products = productRepository.findAll();
         model.addAttribute("products", products);
+        model.addAttribute("productCount", products.size());
+        if (!model.containsAttribute("errorMessage")) {
+            model.addAttribute("errorMessage", null);
+        }
         return "fragments/product-rows";
     }
 
@@ -65,21 +70,16 @@ public class ProductController {
         logger.info("Adding new product: {}", title);
         
         try {
-            // Generate a unique shopify_product_id (using negative numbers for manual entries)
-            Long shopifyProductId = System.currentTimeMillis() * -1;
-            
-            Product product = new Product(shopifyProductId, title, handle, price, productType);
-            Product savedProduct = productRepository.save(product);
-            
-            model.addAttribute("product", savedProduct);
-            model.addAttribute("success", true);
-            return "fragments/product-row";
-            
+            ProductVariant variant = new ProductVariant(null, title, price, null, true);
+            Product product = new Product(null, title, handle, price, productType, List.of(variant));
+            productRepository.save(product);
+            model.addAttribute("errorMessage", null);
+            return loadProducts(model);
+
         } catch (Exception e) {
             logger.error("Error adding product: {}", e.getMessage(), e);
-            model.addAttribute("success", false);
             model.addAttribute("errorMessage", e.getMessage());
-            return "fragments/product-row";
+            return loadProducts(model);
         }
     }
 

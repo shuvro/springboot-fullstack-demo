@@ -2,6 +2,9 @@ package com.respiroc.gregfullstack.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Product {
     private Long id;
@@ -12,17 +15,30 @@ public class Product {
     private String productType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<ProductVariant> variants = new ArrayList<>();
 
     // Default constructor
     public Product() {}
 
     // Constructor for creating new products
     public Product(Long shopifyProductId, String title, String handle, BigDecimal price, String productType) {
+        this(shopifyProductId, title, handle, price, productType, Collections.emptyList());
+    }
+
+    public Product(Long shopifyProductId,
+                   String title,
+                   String handle,
+                   BigDecimal price,
+                   String productType,
+                   List<ProductVariant> variants) {
         this.shopifyProductId = shopifyProductId;
         this.title = title;
         this.handle = handle;
         this.price = price;
         this.productType = productType;
+        if (variants != null) {
+            this.variants = new ArrayList<>(variants);
+        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -92,6 +108,14 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
+    public List<ProductVariant> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(List<ProductVariant> variants) {
+        this.variants = variants != null ? new ArrayList<>(variants) : new ArrayList<>();
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -101,6 +125,7 @@ public class Product {
                 ", handle='" + handle + '\'' +
                 ", price=" + price +
                 ", productType='" + productType + '\'' +
+                ", variantsCount=" + (variants != null ? variants.size() : 0) +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

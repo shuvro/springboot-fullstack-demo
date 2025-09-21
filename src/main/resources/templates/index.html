@@ -343,7 +343,7 @@
                         <wa-icon name="database"></wa-icon>
                         Inventory
                     </div>
-                    <h3 th:text="${productCount}">0</h3>
+                    <h3 id="product-count" th:text="${productCount}">0</h3>
                     <small>Products currently in the database</small>
                 </wa-card>
             </div>
@@ -413,6 +413,10 @@
                                 Price
                             </th>
                             <th>
+                                <wa-icon name="layers" style="margin-right: var(--wa-space-2xs);"></wa-icon>
+                                Variants
+                            </th>
+                            <th>
                                 <wa-icon name="collection" style="margin-right: var(--wa-space-2xs);"></wa-icon>
                                 Type
                             </th>
@@ -424,7 +428,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="5" class="table-empty">
+                            <td colspan="6" class="table-empty">
                                 <wa-icon name="info-circle" style="margin-right: var(--wa-space-s);"></wa-icon>
                                 Use <strong>Load Products</strong> to display items from the database.
                             </td>

@@ -1,30 +1,50 @@
-<th:block th:if="${#lists.isEmpty(products)}">
-    <tr>
-        <td colspan="5" class="table-empty">
-            <wa-icon name="info-circle" style="margin-right: var(--wa-space-s);"></wa-icon>
-            No products found. Select <strong>Sync from API</strong> to fetch the latest inventory.
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <th:block th:if="${errorMessage != null}">
+        <tr>
+            <td colspan="6" class="table-error">
+                <wa-alert variant="danger" open>
+                    <wa-icon name="exclamation-triangle" slot="icon"></wa-icon>
+                    Error adding product: <span th:text="${errorMessage}">Unknown error</span>
+                </wa-alert>
+            </td>
+        </tr>
+    </th:block>
+
+    <th:block th:if="${#lists.isEmpty(products)}">
+        <tr>
+            <td colspan="6" class="table-empty">
+                <wa-icon name="info-circle" style="margin-right: var(--wa-space-s);"></wa-icon>
+                No products found. Select <strong>Sync from API</strong> to fetch the latest inventory.
+            </td>
+        </tr>
+    </th:block>
+
+    <tr th:each="product : ${products}">
+        <td>
+            <span class="product-title" th:text="${product.title}">Product Title</span>
+        </td>
+        <td>
+            <span class="product-handle" th:text="${product.handle}">product-handle</span>
+        </td>
+        <td>
+            <span class="product-price">
+                <span class="product-price__value" th:text="${product.price}">0.00</span>
+                <span class="product-price__currency">NOK</span>
+            </span>
+        </td>
+        <td>
+            <span class="product-variants" th:text="${#lists.size(product.variants)} + ' variants'">0 variants</span>
+        </td>
+        <td>
+            <span th:if="${product.productType != null}" class="product-type-badge" th:text="${product.productType}">Product Type</span>
+            <span th:if="${product.productType == null}" class="product-type-empty">N/A</span>
+        </td>
+        <td>
+            <span class="product-created" th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</span>
         </td>
     </tr>
-</th:block>
 
-<tr th:each="product : ${products}">
-    <td>
-        <span class="product-title" th:text="${product.title}">Product Title</span>
-    </td>
-    <td>
-        <span class="product-handle" th:text="${product.handle}">product-handle</span>
-    </td>
-    <td>
-        <span class="product-price">
-            <span class="product-price__value" th:text="${product.price}">0.00</span>
-            <span class="product-price__currency">NOK</span>
-        </span>
-    </td>
-    <td>
-        <span th:if="${product.productType != null}" class="product-type-badge" th:text="${product.productType}">Product Type</span>
-        <span th:if="${product.productType == null}" class="product-type-empty">N/A</span>
-    </td>
-    <td>
-        <span class="product-created" th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</span>
-    </td>
-</tr>
+    <th:block th:if="${productCount != null}">
+        <span id="product-count" hx-swap-oob="innerHTML" th:text="${productCount}">0</span>
+    </th:block>
+</th:block>

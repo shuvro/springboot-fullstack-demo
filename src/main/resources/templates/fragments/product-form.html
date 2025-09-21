@@ -7,7 +7,7 @@
     <form class="product-form"
           hx-post="/products"
           hx-target="#products-table tbody"
-          hx-swap="beforeend"
+          hx-swap="innerHTML"
           hx-on::after-request="this.reset()">
 
         <div class="form-grid">
