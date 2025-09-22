@@ -20,6 +20,8 @@ import java.util.List;
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MAX_PAGE_SIZE = 50;
 
     private final ProductRepository productRepository;
     private final ProductSyncService productSyncService;
@@ -61,11 +63,57 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public String loadProducts(Model model) {
-        logger.info("Loading products via HTMX");
-        List<Product> products = productRepository.findAll();
+    public String loadProducts(@RequestParam(value = "page", required = false) Integer page,
+                               @RequestParam(value = "size", required = false) Integer size,
+                               Model model) {
+        logger.info("Loading products via HTMX: page={}, size={}", page, size);
+        return renderProductPage(page, size, model);
+    }
+
+    private String renderProductPage(Integer requestedPage, Integer requestedSize, Model model) {
+        int pageSize = requestedSize != null ? requestedSize : DEFAULT_PAGE_SIZE;
+        if (pageSize <= 0) {
+            pageSize = DEFAULT_PAGE_SIZE;
+        } else if (pageSize > MAX_PAGE_SIZE) {
+            pageSize = MAX_PAGE_SIZE;
+        }
+
+        int pageNumber = requestedPage != null ? requestedPage : 0;
+        if (pageNumber < 0) {
+            pageNumber = 0;
+        }
+
+        long totalProducts = productRepository.count();
+        int totalPages = totalProducts == 0 ? 0 : (int) Math.ceil((double) totalProducts / pageSize);
+
+        if (totalPages > 0 && pageNumber >= totalPages) {
+            pageNumber = totalPages - 1;
+        } else if (totalPages == 0) {
+            pageNumber = 0;
+        }
+
+        int offset = pageNumber * pageSize;
+        List<Product> products = totalProducts == 0 ? List.of() : productRepository.findPage(offset, pageSize);
+
+        long pageStart = totalProducts == 0 ? 0 : offset + 1L;
+        long pageEnd;
+        if (totalProducts == 0 || products.isEmpty()) {
+            pageEnd = totalProducts == 0 ? 0 : Math.max(pageStart - 1L, 0L);
+        } else {
+            pageEnd = pageStart + products.size() - 1L;
+        }
+
         model.addAttribute("products", products);
-        model.addAttribute("productCount", products.size());
+        model.addAttribute("productCount", totalProducts);
+        model.addAttribute("currentPage", pageNumber);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalProducts", totalProducts);
+        model.addAttribute("hasPrevious", pageNumber > 0);
+        model.addAttribute("hasNext", totalPages > 0 && pageNumber + 1 < totalPages);
+        model.addAttribute("pageStart", pageStart);
+        model.addAttribute("pageEnd", pageEnd);
+
         if (!model.containsAttribute("errorMessage")) {
             model.addAttribute("errorMessage", null);
         }
@@ -113,12 +161,12 @@ public class ProductController {
             Product product = new Product(null, title, handle, price, productType, List.of(variant));
             productRepository.save(product);
             model.addAttribute("errorMessage", null);
-            return loadProducts(model);
+            return renderProductPage(0, DEFAULT_PAGE_SIZE, model);
 
         } catch (Exception e) {
             logger.error("Error adding product: {}", e.getMessage(), e);
             model.addAttribute("errorMessage", e.getMessage());
-            return loadProducts(model);
+            return renderProductPage(0, DEFAULT_PAGE_SIZE, model);
         }
     }
 
@@ -175,6 +223,8 @@ public class ProductController {
     @PostMapping("/products/{id}/delete")
     public String deleteProduct(@PathVariable Long id,
                                 @RequestParam(value = "q", required = false) String query,
+                                @RequestParam(value = "page", required = false) Integer page,
+                                @RequestParam(value = "size", required = false) Integer size,
                                 @RequestHeader(value = "HX-Request", required = false) Boolean isHxRequest,
                                 Model model,
                                 RedirectAttributes redirectAttributes) {
@@ -190,7 +240,7 @@ public class ProductController {
             if (query != null) {
                 return searchProducts(query, model);
             }
-            return loadProducts(model);
+            return renderProductPage(page, size, model);
         }
 
         redirectAttributes.addFlashAttribute("productDeleted", true);

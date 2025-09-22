@@ -44,10 +44,14 @@
             <span class="product-created" th:text="${product.createdAt != null ? #temporals.format(product.createdAt, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</span>
         </td>
         <td class="table-actions">
+            <input type="hidden" name="page" th:value="${currentPage}" />
+            <input type="hidden" name="size" th:value="${pageSize}" />
             <wa-button variant="danger"
                        th:attr="hx-post=@{/products/{id}/delete(id=${product.id})}"
                        hx-target="#products-table tbody"
                        hx-swap="innerHTML"
+                       hx-include="closest tr"
+                       hx-indicator="#products-loading-indicator"
                        hx-confirm="Are you sure you want to delete this product?">
                 <wa-icon name="trash" slot="prefix"></wa-icon>
                 Delete
@@ -58,4 +62,42 @@
     <th:block th:if="${productCount != null}">
         <span id="product-count" hx-swap-oob="innerHTML" th:text="${productCount}">0</span>
     </th:block>
+
+    <div id="product-pagination"
+         class="pagination-bar"
+         hx-swap-oob="outerHTML"
+         th:classappend="${totalProducts == null or totalProducts == 0} ? ' pagination-bar--hidden' : ''">
+        <span class="pagination-info"
+              th:text="${'Showing ' + (pageStart == null || pageStart == 0 ? 0 : pageStart) + '-' + (pageEnd == null || pageEnd == 0 ? 0 : pageEnd) + ' of ' + (totalProducts != null ? totalProducts : 0) + ' products'}">
+            Showing 0-0 of 0 products
+        </span>
+        <wa-button-group class="pagination-buttons">
+            <wa-button variant="default"
+                       size="small"
+                       th:attr="hx-get=@{/products(page=${currentPage > 0 ? currentPage - 1 : 0}, size=${pageSize})}"
+                       hx-target="#products-table tbody"
+                       hx-swap="innerHTML"
+                       hx-indicator="#products-loading-indicator"
+                       hx-push-url="false"
+                       th:disabled="${!hasPrevious}">
+                <wa-icon name="chevron-left" slot="prefix"></wa-icon>
+                Previous
+            </wa-button>
+            <span class="pagination-page"
+                  th:text="${totalPages != null && totalPages > 0 ? 'Page ' + (currentPage + 1) + ' of ' + totalPages : 'Page 0 of 0'}">
+                Page 0 of 0
+            </span>
+            <wa-button variant="default"
+                       size="small"
+                       th:attr="hx-get=@{/products(page=${hasNext ? currentPage + 1 : currentPage}, size=${pageSize})}"
+                       hx-target="#products-table tbody"
+                       hx-swap="innerHTML"
+                       hx-indicator="#products-loading-indicator"
+                       hx-push-url="false"
+                       th:disabled="${!hasNext}">
+                Next
+                <wa-icon name="chevron-right" slot="suffix"></wa-icon>
+            </wa-button>
+        </wa-button-group>
+    </div>
 </th:block>

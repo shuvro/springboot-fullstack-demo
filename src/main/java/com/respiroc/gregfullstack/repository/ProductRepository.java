@@ -50,6 +50,27 @@ public class ProductRepository {
                 .list();
     }
 
+    public List<Product> findPage(int offset, int limit) {
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
+
+        String sql = """
+            SELECT id, shopify_product_id, title, handle, price, product_type, variants, created_at, updated_at
+            FROM products
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+            """;
+
+        int safeOffset = Math.max(offset, 0);
+
+        return jdbcClient.sql(sql)
+                .param(limit)
+                .param(safeOffset)
+                .query(this::mapProduct)
+                .list();
+    }
+
     public List<Product> searchByTitle(String query) {
         if (query == null) {
             return List.of();
