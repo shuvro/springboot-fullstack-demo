@@ -1,6 +1,6 @@
 # Spring Boot + HTMX Famme Catalog
 
-Spring Boot + HTMX application for keeping a trimmed product catalog in sync with the public Famme API. The app persists products in PostgreSQL, keeps at most 50 products, and exposes a small HTMX-enhanced UI for browsing and triggering syncs.
+Kotlin-based Spring Boot + HTMX application for keeping a trimmed product catalog in sync with the public Famme API. The app persists products in PostgreSQL, keeps at most 50 products, and exposes a small HTMX-enhanced UI for browsing and triggering syncs.
 
 ## Features
 - Hourly scheduled sync that pulls `/products.json` from famme.no and upserts the latest 50 items.
@@ -10,7 +10,7 @@ Spring Boot + HTMX application for keeping a trimmed product catalog in sync wit
 - Docker resources for running PostgreSQL locally and optional containerized app deployment.
 
 ## Tech Stack
-- Java 25 (managed via Gradle toolchain)
+- Kotlin 2.2 (JVM toolchain pinned to Java 24)
 - Spring Boot 3.5 (Web, Data JDBC, Validation, Actuator)
 - Flyway for schema migrations
 - PostgreSQL 15+
@@ -20,26 +20,26 @@ Spring Boot + HTMX application for keeping a trimmed product catalog in sync wit
 ## Project Structure
 ```
 src/
-  main/java/com/respiroc/gregfullstack/
-    GregFullstackApplication.java   # Spring Boot entry point (scheduling enabled)
-    controller/ProductController.java
-    model/Product.java, ProductVariant.java
-    repository/ProductRepository.java
-    service/ProductSyncService.java  # REST client + sync scheduler
+  main/kotlin/com/respiroc/gregfullstack/
+    GregFullstackApplication.kt     # Spring Boot entry point (scheduling enabled)
+    controller/ProductController.kt
+    model/Product.kt, ProductVariant.kt
+    repository/ProductRepository.kt
+    service/ProductSyncService.kt   # REST client + sync scheduler
   main/resources/
     application.properties           # Local profile (PostgreSQL on localhost)
     application-docker.properties    # Docker profile override
     db/migration/                     # Flyway baseline + JSONB migration scripts
     templates/                        # Thymeleaf templates & HTMX fragments
     static/htmx.min.js
-  test/java/...                       # Service and repository tests
+  test/kotlin/...                      # Service and repository tests
 docker/
   postgres/init.sql                   # Seed data or extensions for local DB
 docker-compose.yml
 ```
 
 ## Prerequisites
-- JDK 25 (or a compatible runtime matching the Gradle toolchain)
+- JDK 24 (or a compatible runtime matching the Gradle/Kotlin toolchain)
 - Docker Desktop (optional but recommended for PostgreSQL)
 - `./gradlew` (bundled wrapper) or a compatible Gradle installation
 
@@ -85,7 +85,7 @@ docker-compose.yml
 The current suite uses Mockito-based unit tests (no database required). Add integration tests as needed for repository behaviour.
 
 ## Data Model Highlights
-- `Product` stores metadata plus an in-memory list of `ProductVariant` objects. Setters return `this` to support fluent chaining (useful in repositories and builders).
+- `Product` is a Kotlin class storing metadata plus an in-memory list of `ProductVariant` objects. Setters return `this` to support fluent chaining (useful in repositories and builders).
 - Variants are stored as JSONB (`variants` column) in PostgreSQL. Serialization/deserialization happens through Jackson in `ProductRepository`.
 
 ## Maintenance Notes
